@@ -1,6 +1,7 @@
 import React, { useState, useEffect,useRef } from 'react';
 import { createGlobalStyle, ThemeProvider } from 'styled-components';
 import FallingStars from './FallingStars';
+import ChatWindow from "./ChatWindow";
 import {
   AppBar,
   MenuList,
@@ -35,6 +36,8 @@ import clippy_gif from "./assets/clippynew.gif";
 import clippy from "./assets/clippy.png"
 import mySound from './assets/audio.mp3';
 import granturismo from './assets/granturismo.gif';
+import dog from './assets/dog.png';
+import dog_gif from './assets/dog.gif';
 
 const GlobalStyles = createGlobalStyle`
   ${styleReset}
@@ -154,6 +157,18 @@ function HoverSwap(){
             );
           }
 
+  function HoverSwapDog(){
+            const [hoveredDog, setHovered] = React.useState(false);
+            return(
+              <div
+                onMouseEnter={() => setHovered(true)}
+                onMouseLeave={() => setHovered(false)}
+              >
+              {hoveredDog ? <img src={dog_gif}/> : <img src={dog}/>}
+              </div>
+            );
+          }
+
 
 export default function App() {
   const [open, setOpen] = useState(false);
@@ -202,7 +217,6 @@ export default function App() {
 
   const onMouseUp = () => {
     dragRef.current.isDragging = false;
-    resizeRef.current.isResizing = false;
   };
 
   window.addEventListener('mousemove', onMouseMove);
@@ -593,22 +607,63 @@ export default function App() {
 
         <Separator size="1200px" className="mt-14 flex justify-center mb-4" />
                   
-          <section className="mb-10 w-full text-center pt-5 mt-10 h-full" id="Skills">
-            <div className="relative flex justify-center w-full items-center">
-                  
-              <div className="max-w-2xl text-center">
+          {/* Modified Skills Section */}
+          <section className="mb-10 w-full pt-5 mt-10 h-full" id="Skills">
+            <div className="flex justify-center items-start gap-8 w-full px-4">
+
+              <div className="flex-shrink-0 self-center pt-20">
+                <Tooltip text="Please be respectful and refrain from using profanity." enterDelay={100} leaveDelay={500}>
+                  <HoverSwapDog />
+                </Tooltip>
+              </div>
+              
+              {/* Left Side: Chat Window */}
+              <div className="flex-shrink-0">
+                <h1 className="text-4xl font-bold mb-4 text-center">
+                  Chat
+                </h1>
+                <ChatWindow />
+              </div>
+
+              {/* Right Side: Skills Window */}
+              <div className="text-center">
                 <h1 className="text-4xl font-bold mb-4">
                   Skills 
                 </h1>
+                <Window resizable className="window mb-4" style={{ margin: '0 auto', width: 700 }}>
+                  <WindowHeader>
+                    <span>My Skills.exe</span>
+                  </WindowHeader>
+                  <WindowContent>
+                    <div style={{ textAlign: 'left', padding: '8px', lineHeight: '1.6' }}>
+                      <h3 className="font-bold">Programming Languages:</h3>
+                      <p>JavaScript (React, Node.js), Python, Java, C/C++, C#, SQL</p>
 
+                      <h3 className="font-bold mt-2">Web Development:</h3>
+                      <p>React, Redux, Tailwind CSS, Styled-Components, HTML5, CSS3, REST APIs</p>
 
+                      <h3 className="font-bold mt-2">Database & Backend:</h3>
+                      <p>Firebase (Firestore & Auth), PostgreSQL, MySQL, MongoDB, Express.js</p>
+
+                      <h3 className="font-bold mt-2">Tools & Platforms:</h3>
+                      <p>Git, GitHub, Docker, Jenkins, VS Code</p>
+
+                      <h3 className="font-bold mt-2">Game Development:</h3>
+                      <p>Psy-Q SDK (PlayStation 1), ARMIPS, mkpsxiso</p>
+
+                      <h3 className="font-bold mt-2">Soft Skills:</h3>
+                      <p>Problem Solving, Team Collaboration, Adaptability, Continuous Learning, Creativity</p>
+                    </div>
+                  </WindowContent>
+                </Window>
               </div>
 
-          </div>
-        </section>
-                  
+            </div>
+          </section>      
 
         </main>
+
+        
       </ThemeProvider>)}
     </>
   );
