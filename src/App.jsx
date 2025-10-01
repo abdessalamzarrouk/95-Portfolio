@@ -1,7 +1,10 @@
 import React, { useState, useEffect,useRef } from 'react';
-import { createGlobalStyle, ThemeProvider } from 'styled-components';
+import { createGlobalStyle, ThemeProvider, styled } from 'styled-components';
 import FallingStars from './FallingStars';
+import Poll from './Poll';
 import ChatWindow from "./ChatWindow";
+import RetroComputerChangelog from './ComputerChangeLog';
+import Guestbook from './Guestbook';
 import {
   AppBar,
   MenuList,
@@ -27,6 +30,7 @@ import {
 import ms_sans_serif from 'react95/dist/fonts/ms_sans_serif.woff2';
 import ms_sans_serif_bold from 'react95/dist/fonts/ms_sans_serif_bold.woff2';
 import blue from 'react95/dist/themes/blue';
+import BSOD from './BSOD'; 
 
 import logo from './assets/winxp.png';
 import psx_graphics from './assets/psx_graphics.gif';
@@ -38,6 +42,11 @@ import mySound from './assets/audio.mp3';
 import granturismo from './assets/granturismo.gif';
 import dog from './assets/dog.png';
 import dog_gif from './assets/dog.gif';
+import cursor95 from './assets/cursor95.png';
+import SearchResults from './SearchResults';
+import { searchContent } from './searchContent';
+import computer_gif from './assets/computer.gif';
+import crashSound from './assets/crash.mp3'; // 1. Import your crash sound
 
 const GlobalStyles = createGlobalStyle`
   ${styleReset}
@@ -59,6 +68,7 @@ const GlobalStyles = createGlobalStyle`
     margin: 0;
     padding-top: 150px;
     box-sizing: border-box;
+    cursor: url(${cursor95}) 16 16, auto; /* 16 16 = hotspot center of the cursor */
   }
   .close-icon {
   display: block;
@@ -88,6 +98,16 @@ const GlobalStyles = createGlobalStyle`
   height: 100%;
   transform: translate(-50%, -50%) rotate(-45deg);
 }
+`;
+
+
+const AppContainer = styled.div`
+  cursor: url(${cursor95}), auto;
+
+  /* enforce custom cursor on all children */
+  * {
+    cursor: inherit !important;
+  }
 `;
 
 
@@ -139,7 +159,9 @@ function LoaderScreen({ onComplete }) {
           transform: 'translateY(-20%)', 
         }}
       >
-        <div style={{ fontSize: '18px', marginBottom: '16px' }}>Loading{dots}</div>
+        <div style={{ fontSize: '18px', marginBottom: '16px' }}>
+          <img src="https://external-media.spacehey.net/media/sl7DuoYLeoWJ4jBmR7haKpN9OvPKoqCxZYtZAOJCMY1M=/https://blinkies.cafe/b/display/0222-construction.gif" alt="construction.gif" />
+          Loading{dots}</div>
         <ProgressBar variant="tile" value={Math.floor(percent)} style={{ width: 300 }} />
       </div>
     </div>
@@ -171,8 +193,10 @@ function HoverSwap(){
 
 
 export default function App() {
+  
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [showBsod, setShowBsod] = useState(false); // Add BSOD state
 
   const [starsEnabled, setStarsEnabled] = React.useState(true);
 
@@ -187,6 +211,30 @@ export default function App() {
 
   const [audioOn, setAudioOn] = useState(false);
   const audioRef = useRef(null);
+  const crashAudioRef = useRef(null); 
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [showResults, setShowResults] = useState(false);
+
+  const handleSearch = (e) => {
+    if (e.key === 'Enter' && e.target.value) {
+      const term = e.target.value;
+      setSearchTerm(term);
+      setSearchResults(searchContent(term));
+      setShowResults(true);
+      e.target.value = ''; 
+    }
+  };
+
+  const handleLogout = () => {
+    setAudioOn(false); 
+    if (crashAudioRef.current) {
+      crashAudioRef.current.currentTime = 0;
+      crashAudioRef.current.play();
+    }
+    setShowBsod(true);
+  };
 
   useEffect(() => {
     if (audioRef.current) {
@@ -240,6 +288,7 @@ export default function App() {
   return (
     <>
       <GlobalStyles /> 
+      {showBsod && <BSOD onReboot={() => { setShowBsod(false); setLoading(true); }} />}
       {loading ? (
         <ThemeProvider theme={blue}>
         <LoaderScreen onComplete={() => setLoading(false)} />
@@ -289,7 +338,7 @@ export default function App() {
                     {starsEnabled ? 'Remove Stars' : 'Show Stars'}
                   </MenuListItem>
                   <Separator />
-                  <MenuListItem>
+                  <MenuListItem onClick={handleLogout}> {/* 4. Use the new handler */}
                     <Tooltip text='You are stuck here 🤷‍' enterDelay={100} leaveDelay={500}>
                       Logout   
                     </Tooltip>
@@ -309,7 +358,17 @@ export default function App() {
             <Button variant='menu'>Skills</Button>
             </a>
             <Handle size={38} />
+            <a href="#Skills">
+            <Button variant='menu'>Chat</Button>
+            </a>
+            <Handle size={38} />
+            <a href="#Community">
+            <Button variant='menu'>Community</Button>
+            </a>
+            <Handle size={38} />
+            <a href="#Contact">
             <Button variant='menu'>Contact info</Button>
+            </a>
             <Handle size={38} />
             <Button
               variant="menu"
@@ -319,31 +378,60 @@ export default function App() {
             >
               {audioOn ? 'Sound: On' : 'Sound: Off'}
             </Button>
-            <TextInput placeholder="Search..." width={150} />
+            <TextInput
+              placeholder="Search..."
+              width={150}
+              onKeyDown={handleSearch}
+            />
 
 
           </Toolbar>
         </AppBar>
+
+        {/* --- Render Search Window Here --- */}
+        {showResults && (
+          <SearchResults
+            searchTerm={searchTerm}
+            results={searchResults}
+            onClose={() => setShowResults(false)}
+          />
+        )}
+
         <FallingStars enabled={starsEnabled} />
         <audio ref={audioRef} src={mySound} loop muted={!audioOn} />
+        <audio ref={crashAudioRef} src={crashSound} /> {/* 5. Add the audio element */}
         {/* Main content */}
         <main className="w-full min-h-screen px-4 flex flex-col items-center bg-[rgb(127,179,235)]">
           {/* Hero Section */}
-          <section className="mb-10 max-w-2xl w-full text-center pt-5">
-            <h1 className="text-4xl font-bold underline mb-4">
-              Hi, I’m Abdessalam Zarrouk!
-            </h1>
-            <h2 className="text-3xl font-bold mb-4 flex justify-center items-center gap-2">
-              <Tooltip text="Yes that's me." enterDelay={100} leaveDelay={100}>
-                      <img src={user_icon} alt="user logo" className="h-8 "/> 
-              </Tooltip>
-              A passionate software engineer and lifelong learner
-            </h2>
-            <p className="text-lg text-gray-700 flex justify-center items-center gap-2">
-              <img src={computer_explorer} alt="computer icon" className="h-7" />
-              I enjoy building creative projects, solving problems, and exploring new technologies.
-              This portfolio showcases some of my work and interests.
-            </p>
+          <section className="mb-10 w-full pt-5">
+            <div className="relative flex justify-center w-full items-center">
+              {/* Centered Content */}
+              <div className="max-w-2xl text-center">
+                <h1 className="text-4xl font-bold underline mb-4">
+                  Hi, I’m Abdessalam Zarrouk!
+                </h1>
+                <h2 className="text-3xl font-bold mb-4 flex justify-center items-center gap-2">
+                  <Tooltip text="Yes that's me." enterDelay={100} leaveDelay={100}>
+                    <img src={user_icon} alt="user logo" className="h-8 " />
+                  </Tooltip>
+                  A passionate software engineer and lifelong learner
+                </h2>
+                <p className="text-lg text-gray-700 flex justify-center items-center gap-2">
+                  <img src={computer_explorer} alt="computer icon" className="h-7" />
+                  I enjoy building creative projects, solving problems, and exploring new technologies.
+                  This portfolio showcases some of my work and interests.
+                </p>
+              </div>
+
+              {/* Right-side GIF */}
+              <div className="absolute right-0 flex items-center h-full pr-40">
+                <img 
+                  src={computer_gif} 
+                  alt="Retro computer gif"
+                  style={{ width: '120px' }}
+                />
+              </div>
+            </div>
           </section>
 
           <Separator size="1200px" className="flex justify-center mb-4" />
@@ -658,12 +746,78 @@ export default function App() {
                 </Window>
               </div>
 
+
             </div>
-          </section>      
+          </section>  
+
+          {/* --- Community Section --- */}
+          <Separator size="1200px" className="mt-14 flex justify-center mb-4" />
+
+                <section
+                className="mb-10 w-full pt-5 mt-10 h-full min-h-[70vh] px-4"
+                id="Community"
+              >
+                <h1 className="text-4xl font-bold text-center mb-8">
+                  Community Zone
+                </h1>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-items-center">
+                  {/* Changelog */}
+                  <div className="w-full max-w-sm">
+                        <RetroComputerChangelog />
+                  </div>
+
+                  {/* Polls */}
+                  <div className="w-full max-w-sm">
+                    <Window resizable>
+                      <WindowHeader>
+                        <span>Polls.exe</span>
+                      </WindowHeader>
+                      <WindowContent>
+                        <Poll />
+                      </WindowContent>
+                    </Window>
+                  </div>
+
+                  {/* Guestbook */}
+                  <div className="w-full max-w-sm">
+                        <Guestbook />
+
+                  </div>
+                </div>
+              </section>
+
+
+
+            <Separator size="1200px" className="mt-14 flex justify-center mb-4" />
+
+            <section className="mb-10 w-full pt-5 mt-10 text-center" id="Contact">
+              <h1 className="text-4xl font-bold mb-4">Contact Info</h1>
+              <Window>
+                <WindowHeader>Contact Info</WindowHeader>
+                <WindowContent>
+                  <Frame variant="inside" style={{ padding: "1rem", wordBreak: "break-word" }}>
+                    <p>Email: <Tooltip text='Will add this later lol' enterDelay={100} leaveDelay={500}>
+                      email  
+                    </Tooltip>
+                    </p>
+                    <p>GitHub: <a href="https://github.com/yourname" target="_blank">github.com/yourname</a></p>
+                    <p>LinkedIn: <a href="https://linkedin.com/in/yourname" target="_blank">linkedin.com/in/yourname</a></p>
+                  </Frame>
+                </WindowContent>
+              </Window>
+
+            </section>
+              
+            <Separator size="1200px" className="mt-14 flex justify-center mb-4" />
+              
+            <footer className="text-center mb-5">
+              <p>© {new Date().getFullYear()} Abdessalam Zarrouk</p>
+            </footer>
+    
 
         </main>
 
-        
       </ThemeProvider>)}
     </>
   );

@@ -63,7 +63,7 @@ export default function ChatWindow() {
     await addDoc(collection(db, "messages"), {
       username,
       text: cleaned,
-      timestamp: serverTimestamp(),
+      timestamp: serverTimestamp()
     });
 
     setInput("");
@@ -97,7 +97,7 @@ export default function ChatWindow() {
           alt="profile"
           style={{ height: 16, width: 16, objectFit: "contain" }}
         />
-        Chat.exe
+        MSN Messenger.exe
       </WindowHeader>
       <WindowContent>
         {!username ? (
