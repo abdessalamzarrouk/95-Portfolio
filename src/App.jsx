@@ -1,10 +1,6 @@
 import React, { useState, useEffect,useRef } from 'react';
 import { createGlobalStyle, ThemeProvider, styled } from 'styled-components';
 import FallingStars from './FallingStars';
-import Poll from './Poll';
-import ChatWindow from "./ChatWindow";
-import RetroComputerChangelog from './ComputerChangeLog';
-import Guestbook from './Guestbook';
 import {
   AppBar,
   MenuList,
@@ -38,7 +34,6 @@ import user_icon from './assets/address_book_user.png';
 import computer_explorer from './assets/computer_explorer.png';
 import clippy_gif from "./assets/clippynew.gif";
 import clippy from "./assets/clippy.png"
-import mySound from './assets/audio.mp3';
 import granturismo from './assets/granturismo.gif';
 import dog from './assets/dog.png';
 import dog_gif from './assets/dog.gif';
@@ -370,14 +365,6 @@ export default function App() {
             <Button variant='menu'>Contact info</Button>
             </a>
             <Handle size={38} />
-            <Button
-              variant="menu"
-              onClick={() => setAudioOn(prev => !prev)}
-              style={{ minWidth: 110 }}
-              title={audioOn ? 'Click to mute' : 'Enable background music'}
-            >
-              {audioOn ? 'Sound: On' : 'Sound: Off'}
-            </Button>
             <TextInput
               placeholder="Search..."
               width={150}
@@ -398,7 +385,6 @@ export default function App() {
         )}
 
         <FallingStars enabled={starsEnabled} />
-        <audio ref={audioRef} src={mySound} loop muted={!audioOn} />
         <audio ref={crashAudioRef} src={crashSound} /> {/* 5. Add the audio element */}
         {/* Main content */}
         <main className="w-full min-h-screen px-4 flex flex-col items-center bg-[rgb(127,179,235)]">
@@ -411,7 +397,7 @@ export default function App() {
                   Hi, I’m Abdessalam Zarrouk!
                 </h1>
                 <h2 className="text-3xl font-bold mb-4 flex justify-center items-center gap-2">
-                  <Tooltip text="Yes that's me." enterDelay={100} leaveDelay={100}>
+                  <Tooltip text="Hello !" enterDelay={100} leaveDelay={100}>
                     <img src={user_icon} alt="user logo" className="h-8 " />
                   </Tooltip>
                   A passionate software engineer and lifelong learner
@@ -619,16 +605,6 @@ export default function App() {
                 
                 <WindowContent>
                   <p>
-                    Not a car expert, but the 
-                    <span className="font-bold text-sky-700"> BMW M3 E92 </span>
-                    and 
-                    <span className="font-bold text-indigo-700"> M3 GTR </span>
-                    grabbed me—the high‑revving V8 and that 
-                    <span className="font-semibold text-rose-600"> whining gear‑change sound </span>
-                    just hits the right mix of character.
-                  </p>
-                  <br />
-                  <p>
                     I enjoy <span className="font-semibold text-emerald-600">GT3 sim racing</span> in 
                     <span className="font-bold text-red-600"> Assetto Corsa</span>, dialing in pacing, braking points, and smooth inputs. That tweak → test → repeat loop feels like refactoring code.
                   </p>
@@ -640,21 +616,6 @@ export default function App() {
                     <span className="font-semibold text-slate-800"> drums</span>, and balancing 
                     <span className="font-semibold text-teal-600"> basslines</span> sharpen timing, pattern recognition, and iteration.
                   </p>
-                  <br />
-                  <p className="font-semibold">
-                    A few games that shaped how I think:
-                  </p>
-                  <ul className="mt-1 mb-3 pl-5 list-disc">
-                    <li>
-                      <b className="text-red-600">Assetto Corsa:</b> Precision & discipline.
-                    </li>
-                    <li>
-                      <b className="text-yellow-600">Counter-Strike 1.6:</b> Fast decisions & teamwork.
-                    </li>
-                    <li>
-                      <b className="text-green-600">Minecraft:</b> Open-ended building & experimentation.
-                    </li>
-                  </ul>
                   <p>
                     These hobbies keep me 
                     <span className="font-semibold text-blue-700"> curious</span>, 
@@ -699,19 +660,6 @@ export default function App() {
           <section className="mb-10 w-full pt-5 mt-10 h-full" id="Skills">
             <div className="flex justify-center items-start gap-8 w-full px-4">
 
-              <div className="flex-shrink-0 self-center pt-20">
-                <Tooltip text="Please be respectful and refrain from using profanity." enterDelay={100} leaveDelay={500}>
-                  <HoverSwapDog />
-                </Tooltip>
-              </div>
-              
-              {/* Left Side: Chat Window */}
-              <div className="flex-shrink-0">
-                <h1 className="text-4xl font-bold mb-4 text-center">
-                  Chat
-                </h1>
-                <ChatWindow />
-              </div>
 
               {/* Right Side: Skills Window */}
               <div className="text-center">
@@ -750,45 +698,6 @@ export default function App() {
             </div>
           </section>  
 
-          {/* --- Community Section --- */}
-          <Separator size="1200px" className="mt-14 flex justify-center mb-4" />
-
-                <section
-                className="mb-10 w-full pt-5 mt-10 h-full min-h-[70vh] px-4"
-                id="Community"
-              >
-                <h1 className="text-4xl font-bold text-center mb-8">
-                  Community Zone
-                </h1>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-items-center">
-                  {/* Changelog */}
-                  <div className="w-full max-w-sm">
-                        <RetroComputerChangelog />
-                  </div>
-
-                  {/* Polls */}
-                  <div className="w-full max-w-sm">
-                    <Window resizable>
-                      <WindowHeader>
-                        <span>Polls.exe</span>
-                      </WindowHeader>
-                      <WindowContent>
-                        <Poll />
-                      </WindowContent>
-                    </Window>
-                  </div>
-
-                  {/* Guestbook */}
-                  <div className="w-full max-w-sm">
-                        <Guestbook />
-
-                  </div>
-                </div>
-              </section>
-
-
-
             <Separator size="1200px" className="mt-14 flex justify-center mb-4" />
 
             <section className="mb-10 w-full pt-5 mt-10 text-center" id="Contact">
@@ -797,12 +706,12 @@ export default function App() {
                 <WindowHeader>Contact Info</WindowHeader>
                 <WindowContent>
                   <Frame variant="inside" style={{ padding: "1rem", wordBreak: "break-word" }}>
-                    <p>Email: <Tooltip text='Will add this later lol' enterDelay={100} leaveDelay={500}>
+                    <p>Email: <Tooltip text='Will add this later' enterDelay={100} leaveDelay={500}>
                       email  
                     </Tooltip>
                     </p>
-                    <p>GitHub: <a href="https://github.com/yourname" target="_blank">github.com/yourname</a></p>
-                    <p>LinkedIn: <a href="https://linkedin.com/in/yourname" target="_blank">linkedin.com/in/yourname</a></p>
+                    <p>GitHub: <a href="https://github.com/abdessalamzarrouk" target="_blank">github.com/abdessalamzarrouk</a></p>
+                    <p>LinkedIn: <a href="https://linkedin.com/in/abdessalam-zarrouk" target="_blank">linkedin.com/in/abdessalam-zarrouk</a></p>
                   </Frame>
                 </WindowContent>
               </Window>
