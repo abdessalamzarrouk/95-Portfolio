@@ -353,18 +353,9 @@ export default function App() {
             <Button variant='menu'>Skills</Button>
             </a>
             <Handle size={38} />
-            <a href="#Skills">
-            <Button variant='menu'>Chat</Button>
-            </a>
-            <Handle size={38} />
-            <a href="#Community">
-            <Button variant='menu'>Community</Button>
-            </a>
-            <Handle size={38} />
             <a href="#Contact">
             <Button variant='menu'>Contact info</Button>
             </a>
-            <Handle size={38} />
             <TextInput
               placeholder="Search..."
               width={150}
